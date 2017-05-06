@@ -1,0 +1,19 @@
+
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1.0)
+PROJECT(jsoncppex)
+
+# Require C++11 support, prefer ISO C++ over GNU variants,
+# as relying solely on ISO C++ is more portable.
+SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CXX_EXTENSIONS OFF)
+
+set(JSONCPP_DIR ${CMAKE_HOME_DIRECTORY}/../jsoncpp)
+ADD_SUBDIRECTORY(${JSONCPP_DIR} ${CMAKE_CURRENT_BINARY_DIR}/jsoncpp)
+
+# Include headers
+INCLUDE_DIRECTORIES( ${jsoncpp_SOURCE_DIR}/include include )
+
+ADD_SUBDIRECTORY(src)
+#ADD_SUBDIRECTORY(include)
+
