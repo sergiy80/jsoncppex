@@ -1,0 +1,3 @@
+*.vcxproj	text eol=crlf
+*.vcxproj.filters	text eol=crlf
+*.sln	text eol=crlf
