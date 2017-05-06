@@ -13,8 +13,11 @@
 #include <vector>
 #include <array>
 #include <stdexcept>
+#include <functional>
 
 #include <json/json.h>
+
+static_assert(JSONCPP_VERSION_HEXA >= ((1 << 24) | (8 << 16) | (0 << 8)), "JsonCPP library must be 1.8.0 or later version.");
 
 #include "details/nullable.h"
 #include "details/tuple_utils.h"
@@ -57,15 +60,15 @@ protected:
 
 	// Validates this object against input json. Called before parse, and after create methods
 	// By default does nothing.
-	virtual bool validate(const Json::Value &root) const { return true; };
+	virtual bool validate(const Json::Value &) const { return true; };
 
 	// Called when input json object should be applied to this object.
 	// By default does nothing.
-	virtual bool parse(const Json::Value &root) { return true; };
+	virtual bool parse(const Json::Value &) { return true; };
 
 	// Called when this object should be converted into a json object.
 	// By default does nothing.
-	virtual bool create(Json::Value &root) const { return true; };
+	virtual bool create(Json::Value &) const { return true; };
 };
 
 inline std::string JsonExBase::getJsonString(bool styled/* = true*/) const
@@ -281,6 +284,7 @@ CMainType mainType;
 bool b = mainType.load(jsonString);
 std::string s = mainType.getJsonString();
 */
+
 template<typename _ImplT, typename _Dt = JsonExDataTraits<_ImplT> >
 class JsonEx: public JsonExBase
 {
@@ -498,7 +502,7 @@ protected:
 			return false;
 		}
 		// to call JsonTypeValidate we need only type, not actual value
-		for (size_t i = 0; i < json.size(); i++)
+		for (Json::ArrayIndex i = 0; i < json.size(); i++)
 		{
 			std::ostringstream ss;
 			bool bValid = JsonTypeValidate(json[i], attr, ss, *static_cast<T*>(nullptr));
@@ -528,7 +532,7 @@ protected:
 		for (size_t i = 0; i < Size; i++)
 		{
 			std::ostringstream ss;
-			bool bValid = JsonTypeValidate(json[i], attr, ss, *static_cast<T*>(nullptr));
+			bool bValid = JsonTypeValidate(json[static_cast<Json::ArrayIndex>(i)], attr, ss, *static_cast<T*>(nullptr));
 			if (!bValid)
 			{
 				err << "[" << i << "]" << ss.str();
@@ -640,7 +644,7 @@ protected:
 		value.clear();
 		value.reserve(json.size());
 
-		for (size_t i = 0; i < json.size(); i++)
+		for (Json::ArrayIndex i = 0; i < json.size(); i++)
 		{
 			std::ostringstream ss;
 			value.push_back(T());
@@ -670,7 +674,7 @@ protected:
 		for (size_t i = 0; i < Size; i++)
 		{
 			std::ostringstream ss;
-			bool bValid = JsonValueParse(json[i], attr, ss, value[i]);
+			bool bValid = JsonValueParse(json[static_cast<Json::ArrayIndex>(i)], attr, ss, value[i]);
 			if (!bValid)
 			{
 				err << "[" << i << "]" << ss.str();
